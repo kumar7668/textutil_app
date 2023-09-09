@@ -67,7 +67,7 @@
 
 <div class="container">
 
-<h1>Your Analyzed Text - {{ purpose }}</h1>
+<h1>Your Analyzed Text -{% for item in purpose %} {{ item }}{% endfor %}</h1>
 
 <div style="position:relative;" class="bg-light">
 <p>
