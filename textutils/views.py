@@ -19,6 +19,8 @@ def analyze(request):
     extraspaceremover = request.POST.get('extraspaceremover', 'off')
     numberremover = request.POST.get('numberremover','off')
 
+    # To Store all performed functions in a list
+    purpose =[]
     #Check which checkbox is on
     if removepunc == "on":
         punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
@@ -26,16 +28,19 @@ def analyze(request):
         for char in djtext:
             if char not in punctuations:
                 analyzed = analyzed + char
-
-        params = {'purpose':'Removed Punctuations', 'analyzed_text': analyzed}
+        
+        purpose.append("Removed Punctuations")
+        params = { 'purpose':purpose, 'sub_purpose':'Removed Punctuations',  'analyzed_text': analyzed }
         djtext = analyzed
-
+    
     if(fullcaps=="on"):
         analyzed = ""
         for char in djtext:
             analyzed = analyzed + char.upper()
 
-        params = {'purpose': 'Changed to Uppercase', 'analyzed_text': analyzed}
+
+        purpose.append("Changed to Uppercase")
+        params = {'purpose':purpose, 'sub_purpose': ' And Changed to Uppercase', 'analyzed_text': analyzed}
         djtext = analyzed
 
     if(lowercaps=="on"):
@@ -43,7 +48,8 @@ def analyze(request):
         for char in djtext:
             analyzed = analyzed + char.lower()
 
-        params = {'purpose': 'Changed to LowerCase', 'analyzed_text': analyzed}
+        purpose.append("And Changed to LowerCase")
+        params = {'purpose':purpose, 'sub_purpose': 'Changed to LowerCase', 'analyzed_text': analyzed}
         djtext = analyzed
 
     if(extraspaceremover=="on"):
@@ -57,7 +63,8 @@ def analyze(request):
             elif not(djtext[index] == " " and djtext[index+1]==" "):                        
                 analyzed = analyzed + char
 
-        params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        purpose.append("And Removed ExtraSpaces")
+        params = {'purpose':purpose, 'sub_purpose': 'Removed ExtraSpaces', 'analyzed_text': analyzed}
         djtext = analyzed
 
     if (newlineremover == "on"):
@@ -66,7 +73,9 @@ def analyze(request):
             if char != "\n" and char!="\r":
                 analyzed = analyzed + char
 
-        params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        purpose.append("And Removed NewLines")
+        params = {'purpose':purpose, 'sub_purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        djtext = analyzed
     
     if (numberremover == "on"):
         analyzed = ""
@@ -76,14 +85,20 @@ def analyze(request):
             if char not in numbers:
                 analyzed = analyzed + char
         
-        params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        purpose.append("And Removed Numbers")
+        params = {'purpose':purpose, 'sub_purpose': 'Removed Numbers', 'analyzed_text': analyzed}
         djtext = analyzed
 
     
-    if(removepunc != "on" and newlineremover!="on" and extraspaceremover!="on" and fullcaps!="on" and lowercaps!="on" and numberremover != "on"):
+    if(removepunc != "on" and newlineremover!="on" and extraspaceremover!="on"  and numberremover != "on" and  fullcaps != "on" and lowercaps !="on"):
         return HttpResponse("please select any operation and try again")
 
+    if fullcaps == "on" and lowercaps =="on":
+        return HttpResponse("Fullcaps And Full lowercaps : Only One can run a time!")
+
     return render(request, 'analyze.html', params)
+
+
 
 def about(request):
     return render(request, 'about.html')
